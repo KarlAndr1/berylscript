@@ -1,0 +1,13 @@
+let math = require "math.beryldl"
+
+let abs = function x do
+	if x < 0 do
+		- x
+	end else do
+		x
+	end
+end
+
+(table
+	.abs abs
+) union: math

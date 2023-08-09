@@ -1,0 +1,34 @@
+let loaded-scripts = new table
+
+let load-resource = function path do
+	if path endswith? ".beryl" do # .beryl files get evaluated
+		eval (read path)
+	end elseif path endswith? ".beryldl" do # .beryldl files get loaded as dynamic libs
+		load-dl path
+	end else do # All other files are simply read as text files
+		read path
+	end
+end
+
+let contains? = function str substr do
+	(substr find: substr) =/= null
+end
+
+let require = function path do
+	path replace= "~" (getenv "BERYL_SCRIPT_LIBS")
+	if (not path beginswith? path-separator) do
+		path = cat script-dir path-separator path
+	end
+
+	if path in? loaded-scripts do
+		loaded-scripts path
+	end else do
+		let global script-path = path
+		# Get the directory portion of the path ie foo/bar from foo/bar/char. This path should always contain at least one /
+		assert path contains? path-separator "Path contains no separators"
+		let global script-dir = substring path 0 (find-right path path-separator)
+		let res = load-resource path
+		loaded-scripts insert= path res
+		res
+	end
+end
